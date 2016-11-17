@@ -40,14 +40,14 @@ class SlidingUpPanel: UIView {
     };
     var animationDuration = 0.2;
     var threshold: CGFloat = 30.0;
-    var lastLocation:CGPoint = CGPointMake(0, 0)
-    var toolTipLastLocation:CGPoint? = CGPointMake(0, 0)
+    var lastLocation:CGPoint = CGPoint(x: 0, y: 0)
+    var toolTipLastLocation:CGPoint? = CGPoint(x: 0, y: 0)
     var tooltip: UIView?
     
     //MARK: Life cycle
     override init(frame: CGRect) {
         super.init(frame: frame);
-        self.userInteractionEnabled = true;
+        self.isUserInteractionEnabled = true;
         let tap = UITapGestureRecognizer(target: self, action: #selector(SlidingUpPanel.togglePanel));
         self.addGestureRecognizer(tap);
         
@@ -89,12 +89,12 @@ class SlidingUpPanel: UIView {
         }
         
         if let tooltipView = tooltip {
-            tooltipView.userInteractionEnabled = true;
-            tooltipView.exclusiveTouch = false;
+            tooltipView.isUserInteractionEnabled = true;
+            tooltipView.isExclusiveTouch = false;
         }
     }
     
-    func moveToNearestState(shouldMove shouldMove: Bool) {
+    func moveToNearestState(shouldMove: Bool) {
         if let parent = superview {
             let parentY = parent.frame.height
             let y = self.frame.minY
@@ -158,62 +158,62 @@ class SlidingUpPanel: UIView {
     
     func open() {
         self.delegate?.willOpen()
-        UIView.animateWithDuration(self.animationDuration, animations: { 
+        UIView.animate(withDuration: self.animationDuration, animations: { 
             if let parent = self.superview {
                 self.frame.origin.y = parent.bounds.height - self.frame.height;
                 self.tooltip?.frame.origin.y = (self.frame.height - self.tooltipHeight) * 2;
             }
-        }) { (_) in
+        }, completion: { (_) in
             self.state = .opened
             self.delegate?.didOpen()
-        }
+        }) 
         
     }
     
     func halfOpen() {
         self.delegate?.willHalfOpen()
-        UIView.animateWithDuration(self.animationDuration, animations: {
+        UIView.animate(withDuration: self.animationDuration, animations: {
             if let parent = self.superview {
                 self.frame.origin.y = parent.bounds.height / 2.0;
                 self.tooltip?.frame.origin.y = self.frame.height - self.tooltipHeight * 2 ;
             }
-        }) { (_) in
+        }, completion: { (_) in
             self.state = .halfOpened
             self.delegate?.didHalfOpen()
-        }
+        }) 
 
     }
 
     
     func close() {
         self.delegate?.willClose()
-        UIView.animateWithDuration(self.animationDuration, animations: {
+        UIView.animate(withDuration: self.animationDuration, animations: {
             if let parent = self.superview {
                 self.frame.origin.y = parent.bounds.height - self.tooltipHeight;
                 self.tooltip?.frame.origin.y = 0;
             }
-        }) { (_) in
+        }, completion: { (_) in
             self.state = .closed
             self.delegate?.didClose()
-        }
+        }) 
     }
     
     //MARK: Interactions
-    override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         //check if user touching on the top bar
-        let barFrame = CGRectMake(0,0,self.frame.width,self.tooltipHeight)
-        return CGRectContainsPoint(barFrame, point)
+        let barFrame = CGRect(x: 0,y: 0,width: self.frame.width,height: self.tooltipHeight)
+        return barFrame.contains(point)
     }
     
-    func detectPan(recognizer:UIPanGestureRecognizer) {
-        if recognizer.state == .Began {
+    func detectPan(_ recognizer:UIPanGestureRecognizer) {
+        if recognizer.state == .began {
             lastLocation = self.center
             toolTipLastLocation = tooltip?.center
         }
-        let translation  = recognizer.translationInView(self.superview!)
-        self.center = CGPointMake(lastLocation.x, lastLocation.y + translation.y)
-        if let tooltipView = tooltip , loc = toolTipLastLocation{
-            tooltipView.center = CGPointMake(loc.x, loc.y - 2*translation.y)
+        let translation  = recognizer.translation(in: self.superview!)
+        self.center = CGPoint(x: lastLocation.x, y: lastLocation.y + translation.y)
+        if let tooltipView = tooltip , let loc = toolTipLastLocation{
+            tooltipView.center = CGPoint(x: loc.x, y: loc.y - 2*translation.y)
             if tooltipView.frame.minY < 0 {
                 tooltipView.frame.origin.y = 0;
             }
@@ -222,7 +222,7 @@ class SlidingUpPanel: UIView {
                 tooltipView.frame.origin.y = self.frame.maxY + tooltipView.frame.height;
             }
         }
-        if(recognizer.state == UIGestureRecognizerState.Ended)
+        if(recognizer.state == UIGestureRecognizerState.ended)
         {
             //All fingers are lifted.
             let shouldMove = (translation.y >= self.threshold) || (translation.y <= 0 - self.threshold)

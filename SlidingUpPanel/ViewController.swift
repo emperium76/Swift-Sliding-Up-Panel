@@ -21,23 +21,23 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated);
         panel = SlidingUpPanel(frame: self.view.bounds);
         
-        panel.backgroundColor = UIColor.darkGrayColor()
+        panel.backgroundColor = UIColor.darkGray
         var frame = self.view.bounds
         frame.size.height = 80.0
         let bar = UIView(frame: frame);
-        bar.backgroundColor = UIColor.redColor()
+        bar.backgroundColor = UIColor.red
         panel.topView = bar;
         
         let tooltip = UIView(frame: frame);
-        tooltip.backgroundColor = UIColor.lightGrayColor()
-        let btn = UIButton(frame: CGRectMake(320.0 - 80.0, 0, 80, 30))
-        btn.backgroundColor = UIColor.brownColor()
-        btn.setTitle("OOps", forState: .Normal)
-        btn.addTarget(self, action: #selector(ViewController.greet), forControlEvents: .TouchUpInside)
+        tooltip.backgroundColor = UIColor.lightGray
+        let btn = UIButton(frame: CGRect(x: 320.0 - 80.0, y: 0, width: 80, height: 30))
+        btn.backgroundColor = UIColor.brown
+        btn.setTitle("OOps", for: UIControlState())
+        btn.addTarget(self, action: #selector(ViewController.greet), for: .touchUpInside)
         tooltip.addSubview(btn)
         
         panel.tooltip = tooltip
